@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Podcast.BLL.Services.Contracts;
 using Podcast.BLL.ViewModels.TopicViewModels;
 using Podcast.DAL.DataContext;
+using Podcast.MVC.Helpers.Extensions;
 
 namespace Podcast.MVC.Areas.Admin.Controllers
 {
@@ -10,10 +11,12 @@ namespace Podcast.MVC.Areas.Admin.Controllers
     public class TopicController : Controller
     {
         private readonly ITopicService _topicService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public TopicController(ITopicService topicService)
+        public TopicController(ITopicService topicService, IWebHostEnvironment webHostEnvironment)
         {
             _topicService = topicService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<IActionResult> Index()
@@ -39,8 +42,32 @@ namespace Podcast.MVC.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TopicCreateViewModel vm)
         {
+            if(!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            if(!vm.CoverFile.IsImage())
+            {
+                ModelState.AddModelError("CoverFile", "You should choose image");
+
+                return View();
+            }
+
+            if(!vm.CoverFile.CheckSize(2))
+            {
+                ModelState.AddModelError("CoverFile", "You should choose true image size");
+
+                return View();
+            }
+
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "images", "topics");
+            var imageName = await vm.CoverFile.GenerateFileAsync(path);
+
+            vm.CoverUrl = imageName;
 
             await _topicService.CreateAsync(vm);
 
@@ -75,15 +102,29 @@ namespace Podcast.MVC.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index)); 
         }
 
-        public IActionResult Delete()
+        
+
+       public async Task<IActionResult> Delete(int id)
         {
+            if (id == null) return NotFound();
+
+            await _topicService.RemoveAsync(id);
+
             return View();
         }
 
+
+
+
+
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteTopic(int id)
         {
+            if(id==null) return NotFound();
+
             await _topicService.RemoveAsync(id);
+            
            return RedirectToAction(nameof(Index));
         }
     }

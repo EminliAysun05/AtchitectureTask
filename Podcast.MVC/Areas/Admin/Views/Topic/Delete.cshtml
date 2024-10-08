@@ -1,25 +1,9 @@
 ﻿@model TopicViewModel
-<div class="row">
+@* <img src=""></img> *@
+<h4> @Model.Name</h4>
 
-    <div class="col-md-6 grid-margin stretch-card">
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Delete Topic</h4>
-                <p class="card-description">
-                    Basic form layout
-                </p>
-                <form class="forms-sample" method="post">
-                    <div class="form-group">
-                        <label asp-for="Id">Id</label>
-                        <input asp-for="Id" class="form-control" id="exampleInputUsername1" placeholder="Id">
-                    </div>
-                   
-                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
-                    <button class="btn btn-light" asp-controller="index">Cancel</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
+<form method="post" asp-action="deleteTopic" asp-route-id="@Model.Id">
+    <input asp-for="Id" type="hidden">
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-controller="topic" asp-action="index">Cancel</a>
+</form>

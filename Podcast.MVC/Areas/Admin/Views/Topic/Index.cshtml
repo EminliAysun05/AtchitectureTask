@@ -10,7 +10,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Name</th> 
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -22,7 +22,11 @@
                                 <td>
                                     <a class="btn btn-primary" asp-controller="topic" asp-action="details" asp-route-id="@item.Id">Details</a>
                                     <a class="btn btn-primary" asp-controller="topic" asp-action="update" asp-route-id="@item.Id">Update</a>
-                                    <a class="btn btn-warning" asp-controller="topic" asp-action="delete">Delete</a>
+                                    <form method="post" asp-action="deleteTopic">
+                                        <input type="hidden" name="Id" value="@item.Id" />
+                                        <button type="submit"class="btn btn-danger">Delete</button>
+                                    </form>
+                                   
                                 </td>
                                 
                             </tr>
